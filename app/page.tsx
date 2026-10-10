@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import HeroScene from "./components/HeroScene";
 
 type Language = "en" | "id";
@@ -378,6 +378,15 @@ const content = {
 
 export default function Home() {
   const [language, setLanguage] = useState<Language>("en");
+  
+  // SOLUSI ANTI ERROR VERCEL: Gunakan state ini agar tahun berjalan otomatis
+  // tapi tidak menyebabkan bentrok antara Server Render (Vercel) dan Client Render
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const t = content[language];
 
   return (
@@ -673,7 +682,6 @@ export default function Home() {
             {t.closingDescription}
           </p>
           
-          {/* FIX: Tombol diarahkan ke WhatsApp, style text putih di-force, dan ada efek hover agar terasa responsif */}
           <a 
             href={WA_LINK}
             target="_blank" 
@@ -706,7 +714,7 @@ export default function Home() {
               {t.footerCta} ↗
             </a>
             <span className="opacity-40 font-mono text-xs">
-              © 2026 Dosky
+              © {isMounted ? new Date().getFullYear() : 2026} Dosky · {t.copyright}
             </span>
           </div>
         </div>
