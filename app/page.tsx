@@ -706,7 +706,7 @@ export default function Home() {
               {t.footerCta} ↗
             </a>
             <span className="opacity-40 font-mono text-xs">
-              © {new Date().getFullYear()} Dosky · {t.copyright}
+              © 2026 Dosky
             </span>
           </div>
         </div>
