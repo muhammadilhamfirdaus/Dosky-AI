@@ -379,25 +379,40 @@ const content = {
 export default function Home() {
   const [language, setLanguage] = useState<Language>("en");
   
-  // SOLUSI ANTI ERROR VERCEL: Gunakan state ini agar tahun berjalan otomatis
-  // tapi tidak menyebabkan bentrok antara Server Render (Vercel) dan Client Render
+  // State untuk anti-error Vercel
   const [isMounted, setIsMounted] = useState(false);
+  
+  // State untuk Hamburger Menu Mobile
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
+  // Kunci scroll body saat menu HP terbuka
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isMobileMenuOpen]);
+
   const t = content[language];
 
   return (
-    <main id="top" className="site-shell bg-white text-black">
-      {/* Header */}
-      <header className="site-header">
+    <main id="top" className="site-shell bg-white text-black relative">
+      {/* Header Utama */}
+      <header className="site-header relative z-50">
         <a href="#top" className="wordmark" aria-label="Dosky / AI home">
           Dosky<span className="wordmark-slash"> / AI</span>
         </a>
 
-        <nav className="desktop-nav" aria-label="Main navigation">
+        {/* Navbar Desktop */}
+        <nav className="desktop-nav hidden md:flex" aria-label="Main navigation">
           <a href="#approach">{t.nav[0]}</a>
           <a href="#products">{t.nav[1]}</a>
           <a href="#services">{t.nav[2]}</a>
@@ -405,34 +420,27 @@ export default function Home() {
           <a href="#clients">{t.nav[4]}</a>
         </nav>
 
-        <div className="flex items-center gap-3">
-          <div
-            className="flex items-center border border-black/20 p-1"
-            aria-label="Pilih bahasa / Choose language"
-          >
+        {/* Area Tombol Desktop */}
+        <div className="hidden md:flex items-center gap-3">
+          <div className="flex items-center border border-black/20 p-1" aria-label="Pilih bahasa / Choose language">
             <button
               type="button"
               lang="en"
               aria-pressed={language === "en"}
               onClick={() => setLanguage("en")}
               className={`px-2 py-1 text-[10px] transition-colors ${
-                language === "en"
-                  ? "bg-black text-white"
-                  : "text-black hover:bg-black/5"
+                language === "en" ? "bg-black text-white" : "text-black hover:bg-black/5"
               }`}
             >
               EN
             </button>
-
             <button
               type="button"
               lang="id"
               aria-pressed={language === "id"}
               onClick={() => setLanguage("id")}
               className={`px-2 py-1 text-[10px] transition-colors ${
-                language === "id"
-                  ? "bg-black text-white"
-                  : "text-black hover:bg-black/5"
+                language === "id" ? "bg-black text-white" : "text-black hover:bg-black/5"
               }`}
             >
               ID
@@ -443,7 +451,88 @@ export default function Home() {
             {t.headerCta} <span aria-hidden="true">↗</span>
           </a>
         </div>
+
+        {/* Tombol Hamburger Mobile (Hanya muncul di HP jika menu tertutup) */}
+        <button
+          type="button"
+          className="md:hidden flex flex-col gap-1.5 p-2 focus:outline-none"
+          onClick={() => setIsMobileMenuOpen(true)}
+          aria-label="Open Menu"
+        >
+          <span className="block w-6 h-[2px] bg-black" />
+          <span className="block w-6 h-[2px] bg-black" />
+          <span className="block w-6 h-[2px] bg-black" />
+        </button>
       </header>
+
+      {/* OVERLAY MENU MOBILE (REVISI: Ada header dengan tombol X dan teks putih dipaksa) */}
+      <div 
+        className={`fixed inset-0 z-[100] bg-white flex flex-col transition-transform duration-300 ease-in-out md:hidden ${
+          isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        {/* Header Khusus Menu Mobile dengan Tombol Close (X) */}
+        <div className="flex justify-between items-center w-full p-6 border-b border-black/10">
+          <a href="#top" className="wordmark font-bold tracking-tighter text-xl text-black" onClick={() => setIsMobileMenuOpen(false)}>
+            Dosky<span className="opacity-40 font-normal"> / AI</span>
+          </a>
+          <button
+            type="button"
+            className="p-2 -mr-2 text-black hover:opacity-50 transition-opacity focus:outline-none"
+            onClick={() => setIsMobileMenuOpen(false)}
+            aria-label="Close Menu"
+          >
+            {/* Ikon SVG X (Close) */}
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        {/* Link Navigasi Mobile */}
+        <div className="flex flex-col mt-8 px-6 gap-8 text-3xl font-medium tracking-tight">
+          <a href="#approach" className="hover:opacity-50" onClick={() => setIsMobileMenuOpen(false)}>{t.nav[0]}</a>
+          <a href="#products" className="hover:opacity-50" onClick={() => setIsMobileMenuOpen(false)}>{t.nav[1]}</a>
+          <a href="#services" className="hover:opacity-50" onClick={() => setIsMobileMenuOpen(false)}>{t.nav[2]}</a>
+          <a href="#work" className="hover:opacity-50" onClick={() => setIsMobileMenuOpen(false)}>{t.nav[3]}</a>
+          <a href="#clients" className="hover:opacity-50" onClick={() => setIsMobileMenuOpen(false)}>{t.nav[4]}</a>
+        </div>
+
+        {/* Bagian Bawah Menu Mobile */}
+        <div className="mt-auto flex flex-col gap-6 p-6 bg-gray-50 border-t border-black/10">
+          {/* Pilihan Bahasa di Menu Mobile */}
+          <div className="flex items-center border border-black/20 p-1 w-fit bg-white">
+            <button
+              type="button"
+              onClick={() => { setLanguage("en"); setIsMobileMenuOpen(false); }}
+              className={`px-6 py-3 text-xs font-bold uppercase transition-colors ${language === "en" ? "bg-black text-white" : "text-black hover:bg-black/5"}`}
+            >
+              English
+            </button>
+            <button
+              type="button"
+              onClick={() => { setLanguage("id"); setIsMobileMenuOpen(false); }}
+              className={`px-6 py-3 text-xs font-bold uppercase transition-colors ${language === "id" ? "bg-black text-white" : "text-black hover:bg-black/5"}`}
+            >
+              Indonesia
+            </button>
+          </div>
+          
+          {/* Tombol CTA Mobile (REVISI: Dipaksa warna teks putih) */}
+          <a 
+            href={WA_LINK} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="bg-black px-8 py-5 text-sm font-medium uppercase tracking-widest text-center shadow-lg active:scale-95 transition-transform"
+            style={{ color: "#ffffff" }}
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            {t.headerCta} ↗
+          </a>
+        </div>
+      </div>
+      {/* AKHIR OVERLAY MENU MOBILE */}
 
       {/* Hero */}
       <section className="hero" aria-labelledby="hero-title">
